@@ -32,69 +32,57 @@ public class Mozart {
             {0, 18, 45, 62, 38, 4, 27, 52, 94, 11, 92, 24, 86, 51, 60, 78, 31}
     };
 
-    public Mozart() { }
+    public Mozart() {
+    }
+
     public static int throwDice() {
         return randomizer.nextInt(MAX_VALUE_OF_DICE) + MIN_VALUE_OF_DICE;
 
     }
 
-    public static int[] randomWaltz() {
-        int[] waltz = new int[2 * MEASURES];
+    public static int[] waltzPieceNumbers() {
+        int[] nums = new int[2 * MEASURES];
         for (int i = 1; i <= MEASURES; i++) {
-            waltz[i - 1] = minuet[throwDice() + throwDice()][i];
+            nums[i - 1] = minuet[throwDice() + throwDice()][i];
         }
-        for (int i = MEASURES + 1; i <= waltz.length; i++) {
-            waltz[i - 1] = trio[throwDice()][i - MEASURES];
+        for (int i = MEASURES + 1; i <= nums.length; i++) {
+            nums[i - 1] = trio[throwDice()][i - MEASURES];
         }
-        return waltz;
+        return nums;
     }
 
     public static String[] getWaltz() {
-        int[] waltz1 = randomWaltz();
-        String[] waltz = new String[waltz1.length];
+        int[] nums = waltzPieceNumbers();
+        String[] waltz = new String[nums.length];
         for (int i = 0; i < MEASURES; i++) {
-            waltz[i] = "MozartWaltzGenerator/Waves/M" + waltz1[i] + ".wav";
+            waltz[i] = "MozartWaltzGenerator/Waves/M" + nums[i] + ".wav";
         }
         for (int i = MEASURES; i < waltz.length; i++) {
-            waltz[i] = "MozartWaltzGenerator/Waves/T" + waltz1[i] + ".wav";
+            waltz[i] = "MozartWaltzGenerator/Waves/T" + nums[i] + ".wav";
         }
         return waltz;
     }
 
-    public static double[] build(String[] strings) {
-        int length = 0;
-        // this loop is to find the length of our string
-        for (String string : strings) {
-            length += StdAudio.read(string).length;
-        }
-        // this loop is to get frequency of .wav files
-        int index = 0;
-        double[] output = new double[length];
-        for (String file : strings) {
-            double[] temp = StdAudio.read(file); // get each files frequency data
-            copy(output, temp, index);
-            index += temp.length;
-        }
-        return output;
-    }
 
-    public static void copy(double[] destination, double[] src, int index) {
-        System.arraycopy(src, 0, destination, index, src.length);
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Scanner scan = new Scanner(System.in);
         System.out.println("Building new waltz");
-        double[] waltz = build(Mozart.getWaltz());
+        String[] waltz = Mozart.getWaltz();
         System.out.println("Playing waltz....");
-        StdAudio.play(waltz);
+        for (String peace : waltz) {
+            WaltzPlayer.play(peace);
+            System.out.println("Piece: " + peace.substring(27, 30));
+        }
+        WaltzPlayer.close();
         System.out.println("Finished!");
         System.out.print("Would you like to save it? type y if yes, type n if no: ");
         String input = scan.next();
-        if(input.equals("y")){
-            StdAudio.save(SAVE_PATH, waltz);
-            System.out.println("File saved as: "+SAVE_PATH);
+        if (input.equals("y")) {
+            WaltzPlayer.save(waltz, SAVE_PATH);
+            System.out.println("File saved as: " + SAVE_PATH);
         }
         System.out.println("Good Luck!");
+//        WaltzPlayer.play(SAVE_PATH);
+//        WaltzPlayer.close();
     }
 }
